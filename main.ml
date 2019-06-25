@@ -6,7 +6,7 @@ module State = struct
 
   (* make initial game state *)
   let make (x, y) = 
-    ( x, y, 0.0, 0.0 )  (* x  y  velocity-x  velocity-y  *)
+    ( x, y, 0.0, 0.0 )  (* x  y  velocity-x  velocity-y *)
 
   (* move in increments that singly directional *)
   let push (fx, fy) dt state = 
