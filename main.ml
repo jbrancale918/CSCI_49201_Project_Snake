@@ -1,15 +1,15 @@
 
 open Tsdl
 
-
+(* snake state *)
 module Snake = struct
    type snake = {
    mutable head : (float * float);
    mutable tail : (float * float) list
    }
-
+   (*make initial snake state*)
    let make (x, y) = {head = ( x ,y ); tail = []}
-   
+   (*output current position of snake head*)
    let print_head_pos snk = let (i,j) = snk.head in Printf.printf "( %f , %f ) \n" i j 
 
 end
