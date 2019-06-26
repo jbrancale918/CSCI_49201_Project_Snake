@@ -1,5 +1,5 @@
 
-open Tsdl
+type direction = UP | DOWN | LEFT | RIGHT
 
 (* snake state *)
 module Snake = struct
@@ -11,6 +11,29 @@ module Snake = struct
    let make (x, y) = {head = ( x ,y ); tail = []}
    (*output current position of snake head*)
    let print_head_pos snk = let (i,j) = snk.head in Printf.printf "( %f , %f ) \n" i j 
+   
+   (*helper functions for update*)
+   (*removes last item from a list*)
+   let rec pop_back ls = 
+     match ls with
+     | t::[] -> []
+     | h::t -> h::(pop_back t)    
+   (*if the list doesn't grow, remove last item from the list *)
+   let snake_grow grows ls = 
+     match grows with
+     |true -> ls
+     |false -> pop_back ls
+
+
+   (*update the position of the snake*)
+   let update snk dir grows = 
+     let (i,j) = snk.head in
+     let ls = (snk.head :: snk.tail) in
+      match dir with
+      | UP -> {head = (i +. 1,j);tail = (snake_grow grows ls) }
+      | DOWN -> {head = (i -. 1,j);tail = (snake_grow grows ls) }
+      | LEFT -> {head = (i ,j +. 1);tail = (snake_grow grows ls) }
+      | RIGHT -> {head = (i,j -. 1);tail = (snake_grow grows ls) }
 
 end
 
@@ -134,7 +157,7 @@ let run w h win rend tex =
 
         (* call the loop again *)
         loop time_cur st3
-  in
+  in                                               
 
   loop (Int32.to_int (Sdl.get_ticks())) (State.make (0.5 *. float w, 0.5 *. float h));
   
