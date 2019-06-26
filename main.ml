@@ -10,7 +10,7 @@ module Snake = struct
 
    let make (x, y) = {head = ( x ,y ); tail = []}
    
-
+   let print_head_pos snk = let (i,j) = snk.head in Printf.printf "( %f , %f ) \n" i j 
 
 end
 
