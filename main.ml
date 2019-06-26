@@ -1,14 +1,27 @@
 
 open Tsdl
 
+
+module Snake = struct
+   type snake = {
+   mutable head : (float * float);
+   mutable tail : (float * float) list
+   }
+
+   let make (x, y) = {head = ( x ,y ); tail = []}
+   
+
+
+end
+
 (* Game state *)
 module State = struct
 
   (* make initial game state *)
   let make (x, y) = 
-    ( x, y, 0.0, 0.0 )  (* x  y  velocity-x  velocity-y *)
+    ( x, y, 0.0, 0.0)  (* x  y  velocity-x  velocity-y *)
 
-  (* move in increments that singly directional *)
+  (* move in increments that are singly directional *)
   let push (fx, fy) dt state = 
       let (x, y, vx, vy) = state in
       (x, y, fx*.dt, fy*.dt)
@@ -29,7 +42,7 @@ module State = struct
     else if x > float w then
       (0.0, y, vx , vy)
     else if y < 0.0 then
-      (x, float h, vx, vy )
+      (x, float h, vx, vy)
     else if y > float h then
       (x, 0.0, vx, vy)
     else
