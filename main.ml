@@ -1,3 +1,4 @@
+open Tsdl 
 
 type direction = UP | DOWN | LEFT | RIGHT
 
@@ -16,6 +17,7 @@ module Snake = struct
    (*removes last item from a list*)
    let rec pop_back ls = 
      match ls with
+     | [] -> []
      | t::[] -> []
      | h::t -> h::(pop_back t)    
    (*if the list doesn't grow, remove last item from the list *)
@@ -30,10 +32,10 @@ module Snake = struct
      let (i,j) = snk.head in
      let ls = (snk.head :: snk.tail) in
       match dir with
-      | UP -> {head = (i +. 1,j);tail = (snake_grow grows ls) }
-      | DOWN -> {head = (i -. 1,j);tail = (snake_grow grows ls) }
-      | LEFT -> {head = (i ,j +. 1);tail = (snake_grow grows ls) }
-      | RIGHT -> {head = (i,j -. 1);tail = (snake_grow grows ls) }
+      | UP -> {head = (i +. 1.0,j);tail = (snake_grow grows ls) }
+      | DOWN -> {head = (i -. 1.0,j);tail = (snake_grow grows ls) }
+      | LEFT -> {head = (i ,j +. 1.0);tail = (snake_grow grows ls) }
+      | RIGHT -> {head = (i,j -. 1.0);tail = (snake_grow grows ls) }
 
 end
 
