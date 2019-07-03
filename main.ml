@@ -210,7 +210,7 @@ let () =
         ( match Sdl.create_renderer win ~index:(-1) ~flags:Sdl.Renderer.(accelerated + presentvsync) with
           | Error (`Msg e) -> Sdl.log "Create renderer error: %s" e; exit 1
           | Ok rend ->
-            ( match Sdl.load_bmp "img/pic.bmp" with
+            ( match Sdl.load_bmp "img/circle.bmp" with
             | Error (`Msg e)  -> Sdl.log "Load bmp error: %s" e; exit 1
             | Ok surf ->
 
