@@ -38,6 +38,30 @@ module Snake = struct
       | RIGHT -> {head = (i,j -. 1.0);tail = (snake_grow grows ls) }
 
 end
+ 
+
+
+module Field = struct
+open Snake
+ type field = {
+   mutable snk : snake ;
+   mutable point : (float * float)
+ }
+ 
+ let make snk pnt = (snk , pnt)
+
+ let update snk pnt dir = 
+     let (x,y) = snk.head in
+     let (i,j) = pnt in
+        if (i=x && y=j) then
+           update snk dir true
+        else
+           update snk dir false
+ 
+     
+     
+
+end
 
 (* Game state *)
 module State = struct
