@@ -152,7 +152,7 @@ let run w h win rend tex =
         
   let rec loop time_prev st =
       
-    Sdl.delay 250l; (* in milliseconds *)
+    Sdl.delay 300l; (* in milliseconds *)
         
     let time_cur = Int32.to_int (Sdl.get_ticks()) in
     (* elapsed time in seconds *)
@@ -165,7 +165,7 @@ let run w h win rend tex =
     | opt ->
         (* process one key pressed, if needed *)
         let st2 = 
-          let force = ((float_of_int w) *. 0.05) in
+          let force = ((float_of_int w) *. 0.2) in
           match opt with
           | None -> st
           | Some Left -> State.push (-.force, 0.0) 1.0 st
@@ -197,7 +197,7 @@ let run w h win rend tex =
 
 let () =
   
-  let width = 1000 in
+  let width = 500 in
   let height = 500 in
   
   (* init SDL *)
