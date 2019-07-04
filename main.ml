@@ -33,6 +33,11 @@ module State = struct
    let collision (x,y) (i,j) = 
       (abs_float (x -. i) <= 5.0 ) && (abs_float (y -. j) <= 5.0)
 
+   let rec tail_collision (x,y) ls =
+       match ls with
+       | [] -> false
+       | h::t -> let (i,j) = h in ((collision (x,y) (i,j)) || (tail_collision (x,y) t) )  
+
 (*END HELPER FUNCTIONS*)
 
 
