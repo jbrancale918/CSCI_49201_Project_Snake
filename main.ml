@@ -14,7 +14,7 @@ module State = struct
 
   (* make initial game state *)
   let make (x, y) = 
-    ( (x, y), [] , (5.0, 5.0) , 0.0, 0.0 )  (* (x,  y) empty list  (i,j) velocity-x  velocity-y  *)
+    ( (x, y), [] , (100.0, 100.0 ) , 0.0, 0.0 )  (* (x,  y) empty list  (i,j) velocity-x  velocity-y  *)
 
 
    (*HELPER FUNCTIONS*)
@@ -30,6 +30,8 @@ module State = struct
      |true -> ls
      |false -> pop_back ls
 
+   let collision (x,y) (i,j) = 
+      (abs_float (x -. i) <= 5.0 ) && (abs_float (y -. j) <= 5.0)
 
 (*END HELPER FUNCTIONS*)
 
@@ -46,7 +48,7 @@ module State = struct
   let update (w, h) dt st = 
     let ((x, y), tail , (i,j), vx, vy) = st in
     
-    let grow = ((x=i) && (y=j)) in
+    let grow = collision (x,y) (i,j) in
     let tail = snake_grow (grow) ((x,y)::tail) in
         
 
@@ -102,6 +104,20 @@ let rec get_event () =
 
 let round x = int_of_float (floor (0.5 +. x))
 
+
+let draw_point win rend tex (x,y) = 
+  let tex_rect = Sdl.Rect.create 0 0 20 20 in
+  let dst_rect = Sdl.Rect.create (round x - 10) (round y - 10) 20 20 in
+  ignore (Sdl.render_copy ~src:tex_rect ~dst:dst_rect rend tex)
+
+
+let rec draw_tail win rend tex ls =
+   match ls with
+   | [] -> ()
+   | h::t -> let (x,y) = h in (draw_point win rend tex (x,y); 
+             draw_tail win rend tex t)
+
+
 let draw win rend tex state =
   (* draw the background *)
   ignore (Sdl.set_render_draw_color rend 32 32 32 255);
@@ -111,10 +127,12 @@ let draw win rend tex state =
 (* draw everything *)
   let ((x,y), tl, (i,j), _, _) = state in
 
-  let tex_rect = Sdl.Rect.create 0 0 20 20 in
-  let dst_rect = Sdl.Rect.create (round x - 10) (round y - 10) 20 20 in
-  ignore (Sdl.render_copy ~src:tex_rect ~dst:dst_rect rend tex);
-    
+  draw_point win rend tex (x,y);
+
+  draw_tail win rend tex tl;
+
+  draw_point win rend tex (i,j);
+     
   Sdl.render_present rend
 
   
@@ -163,7 +181,7 @@ let run w h win rend tex =
   Sdl.destroy_renderer rend;
   Sdl.destroy_window win;
   Sdl.quit (); 
-  exit 0
+  exit 0 
 
 
 
