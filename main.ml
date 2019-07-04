@@ -30,8 +30,11 @@ module State = struct
      |true -> ls
      |false -> pop_back ls
 
-   let collision (x,y) (i,j) = 
-      (abs_float (x -. i) <= 5.0 ) && (abs_float (y -. j) <= 5.0)
+   let point_collision (x,y) (i,j) = 
+      (abs_float (x -. i) <= 7.0 ) && (abs_float (y -. j) <= 7.0)
+
+      let collision (x,y) (i,j) = 
+      (abs_float (x -. i) <= 1.0 ) && (abs_float (y -. j) <= 1.0)
 
    let rec tail_collision (x,y) ls =
        match ls with
@@ -53,13 +56,20 @@ module State = struct
   let update (w, h) dt st = 
     let ((x, y), tail , (i,j), vx, vy) = st in
     
-    let grow = collision (x,y) (i,j) in
-    let tail = snake_grow (grow) ((x,y)::tail) in
-        
+    let game_over = tail_collision (x,y) tail in 
+    if game_over then exit 0
+    else
 
+    let grow = point_collision (x,y) (i,j) in
+    let tail = snake_grow (grow) ((x,y)::tail) in
+    
+
+    
     (* displacement *)
     let x = x +. vx*.dt in
     let y = y +. vy*.dt in
+
+    
 
     (* wrap around the walls *)
     if x < 0.0 then
@@ -147,7 +157,7 @@ let run w h win rend tex =
         
   let rec loop time_prev st =
       
-    Sdl.delay 10l; (* in milliseconds *)
+    Sdl.delay 15l; (* in milliseconds *)
         
     let time_cur = Int32.to_int (Sdl.get_ticks()) in
     (* elapsed time in seconds *)
