@@ -1,20 +1,24 @@
-open Tsdl 
 
-type direction = UP | DOWN | LEFT | RIGHT
+open Tsdl
 
-(* snake state *)
-module Snake = struct
-   type snake = {
-   mutable head : (float * float);
-   mutable tail : (float * float) list
-   }
-   (*make initial snake state*)
-   let make (x, y) = {head = ( x ,y ); tail = []}
-   (*output current position of snake head*)
-   let print_head_pos snk = let (i,j) = snk.head in Printf.printf "( %f , %f ) \n" i j 
-   
-   (*helper functions for update*)
-   (*removes last item from a list*)
+(* Game state *)
+module State = struct
+  type state = {
+    head : (float * float);
+    tail : (float * float) list;
+    pont : (float * float);
+    vx : float ;
+    vy : float
+
+  }
+
+  (* make initial game state *)
+  let make (x, y) = 
+    ( (x, y), [] , (5.0, 5.0) , 0.0, 0.0 )  (* (x,  y) empty list  (i,j) velocity-x  velocity-y  *)
+
+
+   (*HELPER FUNCTIONS*)
+(*removes last item from a list*)
    let rec pop_back ls = 
      match ls with
      | [] -> []
@@ -27,75 +31,40 @@ module Snake = struct
      |false -> pop_back ls
 
 
-   (*update the position of the snake*)
-   let update snk dir grows = 
-     let (i,j) = snk.head in
-     let ls = (snk.head :: snk.tail) in
-      match dir with
-      | UP -> {head = (i +. 1.0,j);tail = (snake_grow grows ls) }
-      | DOWN -> {head = (i -. 1.0,j);tail = (snake_grow grows ls) }
-      | LEFT -> {head = (i ,j +. 1.0);tail = (snake_grow grows ls) }
-      | RIGHT -> {head = (i,j -. 1.0);tail = (snake_grow grows ls) }
+(*END HELPER FUNCTIONS*)
 
-end
- 
-
-
-module Field = struct
-open Snake
- type field = {
-   mutable snk : snake ;
-   mutable point : (float * float)
- }
- 
- let make snk pnt = (snk , pnt)
-
- let update snk pnt dir = 
-     let (x,y) = snk.head in
-     let (i,j) = pnt in
-        if (i=x && y=j) then
-           update snk dir true
-        else
-           update snk dir false
- 
-     
-     
-
-end
-
-(* Game state *)
-module State = struct
-
-  (* make initial game state *)
-  let make (x, y) = 
-    ( x, y, 0.0, 0.0)  (* x  y  velocity-x  velocity-y *)
 
   (* move in increments that are singly directional *)
   let push (fx, fy) dt state = 
-      let (x, y, vx, vy) = state in
-      (x, y, fx*.dt, fy*.dt)
+      let ((x,y), tail,(i,j), vx, vy) = state in
+      ((x,y), tail, (i,j), fx*.dt, fy*.dt)
+
+
+
 
   (* update over time dt *)
   let update (w, h) dt st = 
-    let (x, y, vx, vy) = st in
-
+    let ((x, y), tail , (i,j), vx, vy) = st in
+    
+    let grow = ((x=i) && (y=j)) in
+    let tail = snake_grow (grow) ((x,y)::tail) in
+        
 
     (* displacement *)
     let x = x +. vx*.dt in
     let y = y +. vy*.dt in
 
-    (* wrap around *)
-
+    (* wrap around the walls *)
     if x < 0.0 then
-      (float w, y, vx, vy)
+      ((float w,y), tail, (i,j), vx, vy)
     else if x > float w then
-      (0.0, y, vx , vy)
+      ((0.0,y), tail, (i,j), vx, vy)
     else if y < 0.0 then
-      (x, float h, vx, vy)
+      ((x,float h), tail, (i,j), vx, vy)
     else if y > float h then
-      (x, 0.0, vx, vy)
+      ((x, 0.0), tail, (i,j), vx, vy)
     else
-      (x, y, vx, vy)
+      ((x,y), tail, (i,j), vx, vy)
 
 end
 
@@ -139,20 +108,23 @@ let draw win rend tex state =
   ignore (Sdl.render_clear rend);
   
   (* draw the ball *)
-  let (x, y, _, _) = state in
-  
+(* draw everything *)
+  let ((x,y), tl, (i,j), _, _) = state in
+
   let tex_rect = Sdl.Rect.create 0 0 20 20 in
   let dst_rect = Sdl.Rect.create (round x - 10) (round y - 10) 20 20 in
   ignore (Sdl.render_copy ~src:tex_rect ~dst:dst_rect rend tex);
     
   Sdl.render_present rend
 
+  
+(*NEEDS CODE*)
 
 let run w h win rend tex =
         
   let rec loop time_prev st =
       
-    Sdl.delay 300l; (* in milliseconds *)
+    Sdl.delay 10l; (* in milliseconds *)
         
     let time_cur = Int32.to_int (Sdl.get_ticks()) in
     (* elapsed time in seconds *)
@@ -165,7 +137,7 @@ let run w h win rend tex =
     | opt ->
         (* process one key pressed, if needed *)
         let st2 = 
-          let force = ((float_of_int w) *. 0.2) in
+          let force = 200.0 in
           match opt with
           | None -> st
           | Some Left -> State.push (-.force, 0.0) 1.0 st
@@ -183,7 +155,7 @@ let run w h win rend tex =
 
         (* call the loop again *)
         loop time_cur st3
-  in                                               
+  in
 
   loop (Int32.to_int (Sdl.get_ticks())) (State.make (0.5 *. float w, 0.5 *. float h));
   
@@ -197,8 +169,8 @@ let run w h win rend tex =
 
 let () =
   
-  let width = 500 in
-  let height = 500 in
+  let width = 600 in
+  let height = 300 in
   
   (* init SDL *)
   match Sdl.init Sdl.Init.video with 
