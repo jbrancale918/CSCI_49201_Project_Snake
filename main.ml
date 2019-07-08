@@ -31,10 +31,10 @@ module State = struct
      |false -> pop_back ls
 
    let point_collision (x,y) (i,j) = 
-      (abs_float (x -. i) <= 7.0 ) && (abs_float (y -. j) <= 7.0)
+      (abs_float (x -. i) <= 9.0 ) && (abs_float (y -. j) <= 9.0)
 
       let collision (x,y) (i,j) = 
-      (abs_float (x -. i) <= 1.0 ) && (abs_float (y -. j) <= 1.0)
+      (abs_float (x -. i) <= 2.0 ) && (abs_float (y -. j) <= 2.0)
 
    let rec tail_collision (x,y) ls =
        match ls with
@@ -63,6 +63,9 @@ module State = struct
     let grow = point_collision (x,y) (i,j) in
     let tail = snake_grow (grow) ((x,y)::tail) in
     
+
+    let i = if grow then (Random.float (float w)) else i in
+    let j = if grow then (Random.float (float h)) else j in
 
     
     (* displacement *)
